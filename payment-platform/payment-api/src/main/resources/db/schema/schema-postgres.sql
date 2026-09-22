@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    full_name VARCHAR(150),
+    phone_number VARCHAR(50),
+    enabled BOOLEAN DEFAULT TRUE NOT NULL,
+    account_non_locked BOOLEAN DEFAULT TRUE NOT NULL,
+    password_expiry_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    last_login TIMESTAMP,
+    role VARCHAR(50) DEFAULT 'ROLE_USER' NOT NULL
+);

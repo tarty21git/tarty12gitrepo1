@@ -1,0 +1,14 @@
+CREATE TABLE users (
+    id NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    username VARCHAR2(100) NOT NULL UNIQUE,
+    password VARCHAR2(255) NOT NULL,
+    email VARCHAR2(150) NOT NULL UNIQUE,
+    full_name VARCHAR2(150),
+    phone_number VARCHAR2(50),
+    enabled NUMBER(1) DEFAULT 1 NOT NULL,
+    account_non_locked NUMBER(1) DEFAULT 1 NOT NULL,
+    password_expiry_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    last_login TIMESTAMP,
+    role VARCHAR2(50) DEFAULT 'ROLE_USER' NOT NULL
+);

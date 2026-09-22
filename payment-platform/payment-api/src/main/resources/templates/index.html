@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">International Payment Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: #f8fafc;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .nav-tabs {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .nav-tabs .nav-link {
+            color: #94a3b8;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .nav-tabs .nav-link.active {
+            color: #38bdf8;
+            background: transparent;
+            border-bottom-color: #38bdf8;
+            font-weight: 600;
+        }
+        .nav-tabs .nav-link:hover:not(.active) {
+            color: #e2e8f0;
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f8fafc;
+        }
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .table-dark {
+            --bs-table-bg: var(--bg-card);
+            --bs-table-border-color: rgba(255, 255, 255, 0.1);
+        }
+        .form-control, .form-select {
+            background-color: #0f172a;
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #f8fafc;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25);
+        }
+        .badge-success { background-color: #10b981; }
+        .badge-warning { background-color: #f59e0b; }
+        .badge-danger { background-color: #ef4444; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark mb-4 px-4">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-white" href="#">
+            <i class="bi bi-credit-card-2-front-fill text-info"></i>
+            <span id="navAppName">CTH International Payment Gateway</span>
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <a href="/swagger-ui.html" target="_blank" class="btn btn-outline-info btn-sm rounded-pill"><i class="bi bi-code-slash"></i> Swagger API</a>
+            <a href="/login" class="btn btn-outline-danger btn-sm rounded-pill"><i class="bi bi-box-arrow-right"></i> Sign Out</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab"><i class="bi bi-speedometer2"></i> Dashboard</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="gateways-tab" data-bs-toggle="tab" data-bs-target="#gateways" type="button" role="tab"><i class="bi bi-cpu-fill"></i> Payment Gateways &amp; Routers</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab"><i class="bi bi-people-fill"></i> User Maintenance</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab"><i class="bi bi-bar-chart-line-fill"></i> Online Reports</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab"><i class="bi bi-gear-fill"></i> Admin Settings</button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="mainTabsContent">
+
+        <!-- TAB 1: DASHBOARD -->
+        <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="text-muted small text-uppercase font-monospace mb-1">Total Volume</div>
+                        <div class="fs-2 fw-bold text-success" id="dashTotalVolume">$0.00</div>
+                        <div class="text-muted small mt-1"><i class="bi bi-arrow-up-right text-success"></i> Realtime metrics</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="text-muted small text-uppercase font-monospace mb-1">Total Transactions</div>
+                        <div class="fs-2 fw-bold text-info" id="dashTotalTx">0</div>
+                        <div class="text-muted small mt-1"><i class="bi bi-check-circle text-info"></i> Processed requests</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="text-muted small text-uppercase font-monospace mb-1">Active Gateways</div>
+                        <div class="fs-2 fw-bold text-warning" id="dashActiveGateways">4 / 4</div>
+                        <div class="text-muted small mt-1"><i class="bi bi-lightning-charge text-warning"></i> Auto-discovered JARs</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="text-muted small text-uppercase font-monospace mb-1">Active Workers</div>
+                        <div class="fs-2 fw-bold text-primary" id="dashActiveHandlers">8 Workers</div>
+                        <div class="text-muted small mt-1"><i class="bi bi-cpu text-primary"></i> Multi-handler pool</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Payment Execution Form -->
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-lightning-fill text-warning"></i> Process Immediate Payment</h5>
+                        <form id="paymentForm">
+                            <div class="mb-3">
+                                <label class="form-label small">Payment Provider</label>
+                                <select class="form-select" id="payProvider" required>
+                                    <option value="STRIPE">Stripe</option>
+                                    <option value="PAYPAL">PayPal</option>
+                                    <option value="KLARNA">Klarna</option>
+                                    <option value="RAZORPAY">Razorpay</option>
+                                </select>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-7">
+                                    <label class="form-label small">Amount</label>
+                                    <input type="number" step="0.01" class="form-control" id="payAmount" value="250.00" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label small">Currency</label>
+                                    <select class="form-select" id="payCurrency" required>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="INR">INR</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small">Customer Email</label>
+                                <input type="email" class="form-control" id="payEmail" value="client@example.com" required>
+                            </div>
+                            <button type="submit" class="btn btn-info w-100 fw-bold"><i class="bi bi-send-fill"></i> Execute Payment</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-primary"></i> Realtime Transaction Feed</h5>
+                        <div class="table-responsive">
+                            <table class="table table-dark align-middle small">
+                                <thead>
+                                    <tr>
+                                        <th>Tx ID</th>
+                                        <th>Provider</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Handler Instance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentTxTable">
+                                    <tr><td colspan="5" class="text-center text-muted">No transactions recorded yet</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: PAYMENT GATEWAYS & ROUTERS -->
+        <div class="tab-pane fade" id="gateways" role="tabpanel">
+            <div class="card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold m-0"><i class="bi bi-sliders text-info"></i> Multi-Handler &amp; Router Control Center</h5>
+                    <button class="btn btn-sm btn-outline-light" onclick="loadGateways()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+                </div>
+                <div class="row g-4" id="gatewayCards">
+                    <!-- Dynamic Gateway Cards -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: USER MAINTENANCE -->
+        <div class="tab-pane fade" id="users" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-person-plus-fill text-success"></i> Create New User Account</h5>
+                        <form id="registerForm">
+                            <div class="mb-2">
+                                <label class="form-label small">Username</label>
+                                <input type="text" class="form-control" id="regUsername" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">Password</label>
+                                <input type="password" class="form-control" id="regPassword" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">Email</label>
+                                <input type="email" class="form-control" id="regEmail" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">Full Name</label>
+                                <input type="text" class="form-control" id="regFullName">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small">Phone Number</label>
+                                <input type="text" class="form-control" id="regPhone">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 fw-bold"><i class="bi bi-plus-circle"></i> Register User</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-people text-info"></i> System Accounts &amp; Maintenance</h5>
+                        <div class="table-responsive">
+                            <table class="table table-dark align-middle small">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTable">
+                                    <!-- User rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: ONLINE REPORTS -->
+        <div class="tab-pane fade" id="reports" role="tabpanel">
+            <div class="card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0"><i class="bi bi-file-earmark-bar-graph text-warning"></i> Configurable Online Payment Reports</h5>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm" id="reportProviderFilter" style="width: 150px;">
+                            <option value="">All Providers</option>
+                            <option value="STRIPE">Stripe</option>
+                            <option value="PAYPAL">PayPal</option>
+                            <option value="KLARNA">Klarna</option>
+                            <option value="RAZORPAY">Razorpay</option>
+                        </select>
+                        <select class="form-select form-select-sm" id="reportStatusFilter" style="width: 150px;">
+                            <option value="">All Statuses</option>
+                            <option value="SUCCESS">Success</option>
+                            <option value="FAILED">Failed</option>
+                            <option value="REFUNDED">Refunded</option>
+                        </select>
+                        <button class="btn btn-warning btn-sm fw-bold" onclick="loadReport()"><i class="bi bi-filter"></i> Filter</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped align-middle small">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Provider ID</th>
+                                <th>Provider</th>
+                                <th>Amount</th>
+                                <th>Currency</th>
+                                <th>Status</th>
+                                <th>Customer Email</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTable">
+                            <!-- Report rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: ADMIN SETTINGS -->
+        <div class="tab-pane fade" id="admin" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-gear-wide-connected text-primary"></i> Application Configuration</h5>
+                        <form id="appNameForm" class="mb-4">
+                            <label class="form-label small">Configurable Application Title</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cfgAppName" required>
+                                <button type="submit" class="btn btn-primary fw-bold">Update Title</button>
+                            </div>
+                        </form>
+
+                        <hr class="border-secondary my-4">
+
+                        <h5 class="fw-bold mb-3"><i class="bi bi-shield-lock-fill text-warning"></i> Authentication Settings</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="toggleLdap" onchange="toggleLdap(this.checked)">
+                            <label class="form-check-label fw-bold" for="toggleLdap">Enable Windows Active Directory / LDAP Authentication</label>
+                            <div class="text-muted small">When enabled, user credentials validate against Active Directory server before database fallback.</div>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="toggle2fa" onchange="toggle2FA(this.checked)">
+                            <label class="form-check-label fw-bold" for="toggle2fa">Enable SMS / Email 2FA Authentication Switch</label>
+                            <div class="text-muted small">Sends verification OTP via SMS/Email on user registration or sensitive payments.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-database-check text-info"></i> Database Connection Profile</h5>
+                        <ul class="list-group list-group-flush bg-transparent">
+                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
+                                <span>Configured Driver</span>
+                                <span class="badge bg-secondary">Oracle / Postgres / SQL Server / H2</span>
+                            </li>
+                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
+                                <span>Active Strategy</span>
+                                <span class="badge bg-info">Auto-Configured Spring Boot Starters</span>
+                            </li>
+                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
+                                <span>Multi-Handler Architecture</span>
+                                <span class="badge bg-success">Isolated Pluggable Gateway JARs</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadDashboard();
+        loadGateways();
+        loadUsers();
+        loadReport();
+        loadAdminSettings();
+    });
+
+    document.getElementById("paymentForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const payload = {
+            transactionId: "TX-" + Date.now(),
+            provider: document.getElementById("payProvider").value,
+            amount: parseFloat(document.getElementById("payAmount").value),
+            currency: document.getElementById("payCurrency").value,
+            customerEmail: document.getElementById("payEmail").value,
+            description: "Online Checkout Payment"
+        };
+
+        const res = await fetch("/api/payments/process", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        alert(data.message || data.error);
+        loadDashboard();
+        loadReport();
+    });
+
+    async function loadDashboard() {
+        const res = await fetch("/api/reports/summary");
+        const data = await res.json();
+        document.getElementById("dashTotalVolume").innerText = "$" + (data.totalVolumeUSD || 0).toFixed(2);
+        document.getElementById("dashTotalTx").innerText = data.totalTransactions || 0;
+
+        const txRes = await fetch("/api/reports/transactions");
+        const txs = await txRes.json();
+        const tbody = document.getElementById("recentTxTable");
+        tbody.innerHTML = "";
+        txs.slice(-5).reverse().forEach(t => {
+            tbody.innerHTML += `
+                <tr>
+                    <td class="font-monospace">${t.transactionId}</td>
+                    <td><span class="badge bg-primary">${t.provider}</span></td>
+                    <td class="fw-bold">${t.amount} ${t.currency}</td>
+                    <td><span class="badge ${t.status === 'SUCCESS' ? 'badge-success' : 'badge-danger'}">${t.status}</span></td>
+                    <td class="small text-muted">${t.handlerId || 'N/A'}</td>
+                </tr>
+            `;
+        });
+    }
+
+    async function loadGateways() {
+        const res = await fetch("/api/payments/gateways");
+        const data = await res.json();
+        const container = document.getElementById("gatewayCards");
+        container.innerHTML = "";
+
+        data.forEach(g => {
+            let handlerList = g.handlers.map(h => `
+                <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center py-1 px-2 small">
+                    <span>${h.handlerId}</span>
+                    <span class="badge ${h.available ? 'badge-success' : 'badge-danger'}">${h.available ? 'Active' : 'Offline'}</span>
+                </li>
+            `).join("");
+
+            container.innerHTML += `
+                <div class="col-md-6">
+                    <div class="card p-3 border-secondary">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold m-0">${g.provider}</h5>
+                            <button class="btn btn-sm ${g.enabled ? 'btn-danger' : 'btn-success'}" onclick="toggleGateway('${g.provider}', ${!g.enabled})">
+                                ${g.enabled ? '<i class="bi bi-stop-circle"></i> Stop Gateway' : '<i class="bi bi-play-circle"></i> Start Gateway'}
+                            </button>
+                        </div>
+                        <div class="small text-muted mb-2">Policy: <span class="badge bg-info">${g.loadBalancingPolicy}</span> | Handlers: <strong>${g.handlerCount}</strong></div>
+                        <ul class="list-group list-group-flush border-secondary">${handlerList}</ul>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    async function toggleGateway(provider, active) {
+        await fetch(`/api/payments/gateways/${provider}/status?active=${active}`, {method: "POST"});
+        loadGateways();
+    }
+
+    async function loadUsers() {
+        const res = await fetch("/api/users");
+        const data = await res.json();
+        const tbody = document.getElementById("userTable");
+        tbody.innerHTML = "";
+        data.forEach(u => {
+            tbody.innerHTML += `
+                <tr>
+                    <td class="fw-bold">${u.username}</td>
+                    <td>${u.email}</td>
+                    <td><span class="badge bg-secondary">${u.role}</span></td>
+                    <td><span class="badge ${u.accountNonLocked ? 'badge-success' : 'badge-danger'}">${u.accountNonLocked ? 'Active' : 'Locked'}</span></td>
+                    <td>
+                        <button class="btn btn-sm ${u.accountNonLocked ? 'btn-outline-warning' : 'btn-outline-success'}" onclick="toggleLock('${u.username}', ${u.accountNonLocked})">
+                            ${u.accountNonLocked ? 'Lock' : 'Unlock'}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    async function toggleLock(username, currentLocked) {
+        await fetch(`/api/users/${username}/lock?locked=${currentLocked}`, {method: "POST"});
+        loadUsers();
+    }
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const payload = {
+            username: document.getElementById("regUsername").value,
+            password: document.getElementById("regPassword").value,
+            email: document.getElementById("regEmail").value,
+            fullName: document.getElementById("regFullName").value,
+            phoneNumber: document.getElementById("regPhone").value
+        };
+
+        const res = await fetch("/api/users/register", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        alert(data.message || data.error);
+        loadUsers();
+    });
+
+    async function loadReport() {
+        const provider = document.getElementById("reportProviderFilter").value;
+        const status = document.getElementById("reportStatusFilter").value;
+        let url = "/api/reports/transactions?";
+        if (provider) url += `provider=${provider}&`;
+        if (status) url += `status=${status}&`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+        const tbody = document.getElementById("reportTable");
+        tbody.innerHTML = "";
+        data.forEach(t => {
+            tbody.innerHTML += `
+                <tr>
+                    <td class="font-monospace small">${t.transactionId}</td>
+                    <td class="font-monospace small text-muted">${t.providerTransactionId || 'N/A'}</td>
+                    <td><span class="badge bg-primary">${t.provider}</span></td>
+                    <td class="fw-bold">${t.amount}</td>
+                    <td>${t.currency}</td>
+                    <td><span class="badge ${t.status === 'SUCCESS' ? 'badge-success' : 'badge-danger'}">${t.status}</span></td>
+                    <td>${t.customerEmail || 'N/A'}</td>
+                    <td class="small text-muted">${t.createdAt}</td>
+                </tr>
+            `;
+        });
+    }
+
+    async function loadAdminSettings() {
+        const res = await fetch("/api/admin/settings");
+        const data = await res.json();
+        document.getElementById("navAppName").innerText = data.appName;
+        document.getElementById("cfgAppName").value = data.appName;
+        document.getElementById("toggleLdap").checked = data.ldapEnabled;
+        document.getElementById("toggle2fa").checked = data.twoFactorEnabled;
+    }
+
+    document.getElementById("appNameForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const appName = document.getElementById("cfgAppName").value;
+        await fetch(`/api/admin/settings/app-name?appName=${encodeURIComponent(appName)}`, {method: "POST"});
+        loadAdminSettings();
+    });
+
+    async function toggleLdap(enabled) {
+        await fetch(`/api/admin/settings/ldap?enabled=${enabled}`, {method: "POST"});
+    }
+
+    async function toggle2FA(enabled) {
+        await fetch(`/api/admin/settings/2fa?enabled=${enabled}`, {method: "POST"});
+    }
+</script>
+</body>
+</html>
